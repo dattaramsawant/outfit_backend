@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.use('/',(req,res)=>{
-  res.end('first route')
-})
+const user=require('./userRoute')
+
+router.use('/user',user)
 
 module.exports = router;
