@@ -1,7 +1,7 @@
 
 const UUID=require('uuid')
 
-const validateUUID = (id) =>{
+const validateUserID = (id) =>{
     const validId=[]
     const inValidId =[]
 
@@ -16,6 +16,11 @@ const validateUUID = (id) =>{
     return {validId,inValidId}
 }
 
+const validateUUID = (id) =>{
+    return UUID.validate(id)
+}
+
 module.exports={
+    validateUserID,
     validateUUID
 }

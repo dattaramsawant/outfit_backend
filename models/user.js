@@ -33,11 +33,13 @@ module.exports=(sequelize,DataTypes)=>{
         },
         mobileNumber:{
             type: DataTypes.INTEGER
+        },
+        role:{
+            type: DataTypes.UUID
         }
     },{
         timestamps: true,
         paranoid: true
     })
-
     return user;
 }

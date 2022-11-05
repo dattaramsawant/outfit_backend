@@ -1,13 +1,27 @@
 const DB = require('../models');
 const bcrypt = require('bcrypt');
 const { Op } = require("sequelize");
-const { validateUUID } = require('../utility/utility');
+const { validateUserID, validateUUID } = require('../utility/utility');
+
+DB.users.hasMany(DB.roles,{foreignKey:'user_id',as:"createdRoles"})
+DB.users.belongsTo(DB.roles,{foreignKey:'role',as:'userRole'})
 
 const getAllUser=async(req,res)=>{
     await DB.users.findAndCountAll({
         attributes:{
-            exclude: ['password','deletedAt']
-        }
+            exclude: ['password','deletedAt','role']
+        },
+        include:[{
+            model: DB.roles,
+            as:'userRole',
+            attributes: ["id","role"]
+        },
+        // {
+        //     model: DB.roles,
+        //     as:'createdRoles',
+        //     attributes: ["id","role"]
+        // }
+        ]
     })
     .then(user=>{
         return res.status(200).json({...user,status:"Success"})
@@ -19,10 +33,27 @@ const getAllUser=async(req,res)=>{
 }
 
 const createUser=async(req,res)=>{
-    const {password} = req.body
+    const {password,username,firstName,lastName,gender,email,mobileNumber,role} = req.body
     const hashPassword = await bcrypt.hash(password,10)
+    if(!validateUUID(role)){
+        return res.status(400).json({status:"Error",message:"Role is not valid."})
+    }
+    const checkRole = await DB.roles.findOne({
+        where:{
+            id: role
+        }
+    })
+    if(!checkRole) {
+        return res.status(400).json({status:"Error",message:"Role is not valid."})
+    }
     const userObject={
-        ...req.body,
+        username,
+        firstName,
+        lastName,
+        gender,
+        email,
+        mobileNumber,
+        role,
         password: hashPassword
     }
     await DB.users.create(userObject)
@@ -38,7 +69,7 @@ const createUser=async(req,res)=>{
 const deleteUser=async(req,res)=>{
     const {id}=req.body
     
-    const {validId,inValidId} = validateUUID(id)
+    const {validId,inValidId} = validateUserID(id)
     await DB.users.findAll({
         where:{
             id: validId
@@ -85,7 +116,7 @@ const deleteUser=async(req,res)=>{
 
 const restoreUser=async(req,res)=>{
     const {id}=req.body
-    const {validId,inValidId} = validateUUID(id)
+    const {validId,inValidId} = validateUserID(id)
     
     await DB.users.findAll({
         where:{

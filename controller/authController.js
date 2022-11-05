@@ -24,12 +24,12 @@ const login =async(req,res)=>{
     }
 
     const accessToken = jwt.sign(
-        {"UserInfo":{"username": validUser.username}},
+        {"UserInfo":{"username": validUser.username, "id": validUser.id}},
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: '15m' }
     )
     const refreshToken = jwt.sign(
-        { "username": validUser.username },
+        { "username": validUser.username, "id": validUser.id },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
     )
@@ -50,7 +50,8 @@ const login =async(req,res)=>{
             lastName: validUser.lastName,
             mobileNumber: validUser.mobileNumber,
             email: validUser.email,
-            username: validUser.username
+            username: validUser.username,
+            id: validUser.id
         }
     })
 }
@@ -75,7 +76,8 @@ const refresh=async(req,res)=>{
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "username": validUser.username
+                        "username": validUser.username,
+                        "id": validUser.id
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
@@ -91,7 +93,8 @@ const refresh=async(req,res)=>{
                     lastName: validUser.lastName,
                     mobileNumber: validUser.mobileNumber,
                     email: validUser.email,
-                    username: validUser.username
+                    username: validUser.username,
+                    id: validUser.id
                 }
             })
         }
